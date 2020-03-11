@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Android & Windows Wi-Fi Profile Generator</title>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <!-- The goal of this is simple - for the data you enter into the fields, to edit the generated XML at the bottom.
+    You should then be able to click the "Copy" button and paste it into a file.
+
+    This app is fully self-contained, and this code can be copied/used freely (more info below on the dependencies) 
+    I simply ask for you to credit me if you wish, and link to my GitHub repo for this.
+    https://github.com/daduckMSFT/WiFiProfileGenerator
+
+    =======================================================================================
+    This page  us using Bootstrap as the CSS framework, and some simple JQuery functions to take the input you type in and edit the text at the bottom. 
+    Additionally, it uses a JS Framework ("Clipboard.JS" - https://clipboard.js or https://github.com/zenorocha/clipboard.js ) to copy the profile to your clipboard
+    While this page DOES have the framework unpacked locally, you can utilize a CDN for it - I've included it below, or more info can be found at the above GitHub link.
+    -->
+
+    <style>
+      body {
+        background-color: #1a1a1a;
+      }
+    </style>
+  </head>
+  <body>
+    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+    <!-- Load clipboard.js from local repo -->
+    <script src="./js/clipboard.min.js"></script>
+    <!-- Load clipboard.js from CDN  
+    <script src="https://unpkg.com/clipboard@2/dist/clipboard.min.js"></script> -->
+    <script>new ClipboardJS('.btn');</script>
+    <!-- This is what converts the SSID to Hex in the resulting profile
+    This function is called immediately on page load and constantly reads the values in the Wi-Fi SSID box and converts it to hex -->
+    <script>
+      function toHex(input) {
+          var result = "";
+              for (i=0; i<input.length; i++) {
+                  hex = input.charCodeAt(i).toString(16);
+                  result += (hex).slice(-4);
+              }
+          return result
+          };
+          function readHex() {
+              $( "#inputSSID" )
+              .keyup(function() {
+              var color = 'Aqua';
+              var value = $( this ).val();
+              outputvalue = toHex(value);
+              $( "#outputSSIDHex" ).text( outputvalue );
+              $( "#outputSSIDHex" ).css('color', color );
+              });
+          }
+    </script>
+
+    <!--Brief overview of what happens (very high level) - the input you enter into the fields (eg; SSID) or the buttons you tick, modify the default text in the "Generated Profile" at the bottom. 
+        The profile at the bottom is held in a set of two elements - <pre> and <code>. This keeps the formatting. 
+        The contents inside of it are a default one I exported from a Windows machine. I added some simple <span> elements to modify the text. 
+          There are spans (such as <span id="outputSSID">Sample SSID</span> that I identify with an ID - aka, outputSSID. 
+        These are changed in real-time with some javascript functions that run in the browser. See below for more... 
+        
+        For more information on these, visit my GitHub: https://github.com/daduckMSFT/WiFiProfileGenerator
+      -->
+    <script>
+        var colorAqua = 'Aqua';
+        var colorWhite = 'White';
+
+        function inputText(input,output,output2=0) {
+          $( input )
+          .keyup(function(){
+            var value = $( input ).val();
+            $( output ).text( value );
+            $( output ).css('color', colorAqua );
+            if (output2 != 0) {
+              $( output2 ).text( value );
+              $( output2 ).css('color', colorAqua );};
+          });
+        };
+        
+        function changeValue(destination,value,color,destination2=0,value2=0) {
+          var dest = document.getElementById(destination);
+          if (color == 'aqua') {
+            var color = colorAqua;};
+          if (color == 'white') {
+            var color = colorWhite;};
+          if (destination2 != 0) {
+            var dest2 = document.getElementById(destination2);};
+          $( dest ).text( value );
+          $( dest ).css('color', color);
+          if (dest2 != null) {
+            $( dest2 ).text( value2 );
+            $( dest2 ).css('color', color);};
+        };
+        
+        function passphraseEnableDisable(input) {
+          var disabledState = $( '#inputPassphrase' ).is( ":disabled" );
+          var passphraseInput = $( '#inputPassphrase' );
+          var passphraseOutput = $( '#outputPassphrase' );
+
+          if (input == 'disable') {
+            passphraseInput.prop( "value", "");
+            passphraseOutput.prop ( "textContent", "");
+            passphraseInput.prop( "disabled", true);
+            };
+
+          if ((disabledState = true) & (input == 'enable')) {
+            passphraseInput.prop( "disabled", false);
+            };
+        };
+
+        function openSecurity() {
+          changeValue('outputSecurityType','open','white','outputEncryption','none');
+          passphraseEnableDisable('disable');}; 
+
+    </script>
+
+    <!-- We take two of the above created functions, and when the page finishes loading, it calls them -->
+    <script>
+      $(document).ready(function(){
+        readHex();
+        inputText("#inputSSID","#outputSSID","#outputNetworkName");
+        inputText("#inputPassphrase","#outputPassphrase");
+      });
+    </script>
+
+    <!-- This is the parent container, that keeps everything lined up in the middle -->
+    <div class="container">
+        <main role="main" class="pb-1 pt-2">
+          <!-- navbar -->
+            <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+              <span class="navbar-brand">Wi-Fi Profile Generator</span>
+              <ul class="navbar-nav mr-auto">
+                  <div class="collapse navbar-collapse" id="navbarSupportedContent"></div>
+                  <li class="nav-item">
+                    <a class="nav-link" href="./index.html">iOS</a>
+                  </li>
+                  <li class="nav-item active">
+                    <a class="nav-link" href="#">Android & Windows <span class="sr-only">(current)</span></a>
+                  </li>
+              </ul>
+              <ul class="navbar-nav">
+                <a class="nav-item nav-link text-white font-weight-bold" href="https://github.com/daduckMSFT/WiFiProfileGenerator/" target="_blank">GitHub</a>
+              </ul>
+            </nav>
+            <hr />
+
+            <!-- This is the "What is this for?" box-->
+            <div class="card text-light bg-dark mb-3 border-secondary">
+                <div class="card-body">
+                    <h3 class="card-title font-weight-bold">What is this for?</h3>
+                    <p>If you need to configure your Android or Windows devices, using a Wi-Fi network - you can either use the GUI, or this.  <br>
+                    Sometimes the option you need isn't in the UI - so as a workaround, you can find out what the manual option is and generate it. <br>
+                    This is meant to be a supplement to that.</p>
+                    <hr />
+                    <p>Both Android & Windows use the same XML format, as far as I'm aware (there might be fields that vary). 
+                    Use this as the basis, and enjoy! <br>
+
+                    <p>This site will help generate a configuration profile based on the network information you provide. <br>
+                        Using this, you can import the profile into your mobile devices (via a method such as an MDM).</p>
+                    <p>You can see all of the modified output in the bottom as <b><span style="color:aqua">aqua</span></b> text.</p>
+                    <hr />
+                    <p class="font-italic">All of this is run client-side, within the browser. </p>
+                    <hr />
+                    <span class="font-weight-light"><p>Extra stuff: </p>
+                      <a class="text-primary" href="https://docs.microsoft.com/en-us/windows/win32/nativewifi/wireless-profile-samples" target="_blank">Wireless profile samples</a><br>
+                      <a class="text-primary" href="https://docs.microsoft.com/en-us/windows/win32/nativewifi/wlan-profileschema-elements" target="_blank">XML Profile Elements</a></span>
+                </div>
+            </div>
+            <hr />
+
+            <!-- This is the box containing the Wi-Fi network input -->
+            <div class="card text-light bg-dark border-secondary">
+                <div class="card-body">
+                    <h5 class="card-title font-weight-bold">Fill out your Wi-Fi network details below. This only supports "Personal" connections.</h5>
+                        
+                        <!-- This is where the Input forms begin 
+                          In essence, every field is labeled as "inputX" - where X is the property we're modifying. Do not adjust the ID's without understanding the functions at the top. 
+                          The "output" (aka, where what they put in is copied) is further in the Generated Profile section -->
+                        <form>
+                            <div class="form-group row">
+                              <label for="inputSSID" class="col-sm-2 col-form-label">Wi-Fi SSID</label>
+                              <div class="col-sm-10">
+                                <input type="text" class="form-control" id="inputSSID" placeholder="Enter your Wi-Fi network's SSID">
+                              </div>
+
+                            </div>
+                            <div class="form-group row">
+                              <label for="inputPassphrase" class="col-sm-2 col-form-label">Pre-Shared Key/Passphrase</label>
+                              <div class="col-sm-10">
+                                <!-- setting the "type" to password means the browser won't reveal it, and shows the eye to reveal it if they want -->
+                                <input type="password" class="form-control" id="inputPassphrase" placeholder="Enter passphrase" disabled>
+                              </div>
+                            </div>
+                            <fieldset class="form-group">
+                              <div class="row">
+                                <legend class="col-form-label col-sm-2 pt-0">Security</legend>
+                                <div class="col-sm-10">
+                                  <div class="form-check">
+                                    <!-- This is where the user can select the desired security types - Open, WEP, WPA WPA2.
+                                      WEP is disabled simply because it's terrible from a security perspective, and WPA/WPA2 both use AES as TKIP is no longer hardware accelerated.  -->
+                                    <input class="form-check-input" type="radio" name="SecurityRadios" id="inputSecurityOpen" value="option1" onclick="openSecurity()" checked>
+                                    <label class="form-check-label" for="gridRadios1">
+                                      Open / None
+                                    </label>
+                                  </div>
+
+                                  <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="SecurityRadios" id="inputSecurityWEP" value="option2" disabled>
+                                    <label class="form-check-label" for="gridRadios2">
+                                      WEP (not supported)
+                                    </label>
+                                  </div>
+                                  <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="SecurityRadios" id="inputSecurityWPA" value="option3" onclick="changeValue('outputSecurityType','WPAPSK','aqua','outputEncryption','AES');passphraseEnableDisable('enable')">
+                                    <label class="form-check-label" for="gridRadios3">
+                                      WPA
+                                    </label>
+                                  </div>
+                                  <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="SecurityRadios" id="inputSecurityWPA2" value="option4" onclick="changeValue('outputSecurityType','WPA2PSK','aqua','outputEncryption','AES');passphraseEnableDisable('enable')">
+                                    <label class="form-check-label" for="gridRadios4">
+                                      WPA2
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                            </fieldset>
+                            <fieldset class="form-group">
+                              <div class="row">
+                                <!-- This is where the user can specify if the network is hidden or not -->
+                                <legend class="col-form-label col-sm-2 pt-0">Hidden network?</legend>
+                                <div class="col-sm-10">
+                                  <div class="form-check-inline">
+                                    <input class="form-check-input" type="radio" name="hiddenRadios" id="inputHiddenNo" value="option1" onclick="changeValue('outputHidden','false','white')" checked>
+                                    <label class="form-check-label" for="gridRadios1">
+                                      No
+                                    </label>
+                                  </div>
+                                  <div class="form-check-inline">
+                                    <input class="form-check-input" type="radio" name="hiddenRadios" id="inputHiddenYes" value="option2" onclick="changeValue('outputHidden','true','aqua')">
+                                    <label class="form-check-label" for="gridRadios2">
+                                      Yes
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                            </fieldset>
+                            
+                            <!-- Automatically Connect to the Wi-Fi? -->
+                            <fieldset class="form-group">
+                              <div class="row">
+                                <!-- This is where you can specify if the device will connect to Wi-Fi automatically when in range  -->
+                                <legend class="col-form-label col-sm-2 pt-0">Automatically connect?</legend>
+                                <div class="col-sm-10">
+                                  <div class="form-check-inline">
+                                    <input class="form-check-input" type="radio" name="AutoJoinRadios" id="inputAutoJoinYes" value="option1" onclick="changeValue('outputAutoJoin','auto','white')" checked>
+                                    <label class="form-check-label" for="gridRadios1">
+                                      Yes
+                                    </label>
+                                  </div>
+                                  <div class="form-check-inline">
+                                    <input class="form-check-input" type="radio" name="AutoJoinRadios" id="inputAutoJoinNo" value="option2" onclick="changeValue('outputAutoJoin','manual','aqua')">
+                                    <label class="form-check-label" for="gridRadios2">
+                                      No
+                                    </label>
+                                  </div>
+                                </div>
+                              </div>
+                            </fieldset>
+
+                          </form>
+                </div>
+            </div> <hr />
+
+            <div class="card text-light bg-dark border-secondary">
+                <div class="card-body">
+                  <!-- The "Generated Profile" card at the bottom 
+                  This  contains the escaped, default XML that I've started with - and after the user puts their input, it will be rendered here too. 
+                  The values are placed into span elements with specifics ID's, via the functions at the start. 
+                  This is presented in a pre-scrollable code box -->
+                    <h4 class="card-title font-weight-bold">Generated Profile</h4>
+
+                    <div class="col-auto">
+                      <button type="button" class="btn btn-primary" data-clipboard-target="#generated_profile" id="CopyAll" active>Copy to clipboard</button>
+                    </div>
+                      <hr />
+                    <!-- Since "pre" attributes retain spacing, the profile has white spaced removed so it isn't copied when the user gets it -->
+                    <pre id="generated_profile" class="pre-scrollable text-light bg-secondary"><code>&lt;?xml version=&quot;1.0&quot;?&gt;
+&lt;WLANProfile xmlns=&quot;http://www.microsoft.com/networking/WLAN/profile/v1&quot;&gt;
+	&lt;name&gt;<span id="outputNetworkName">Network Name</span>&lt;/name&gt;
+	&lt;SSIDConfig&gt;
+		&lt;SSID&gt;
+                    &lt;hex&gt;<span id="outputSSIDHex">53534944</span>&lt;/hex&gt;
+                    &lt;name&gt;<span id="outputSSID">SSID</span>&lt;/name&gt;
+                &lt;/SSID&gt;
+                &lt;nonBroadcast&gt;<span id="outputHidden">false</span>&lt;/nonBroadcast&gt;
+	&lt;/SSIDConfig&gt;
+	&lt;connectionType&gt;ESS&lt;/connectionType&gt;
+	&lt;connectionMode&gt;<span id="outputAutoJoin">auto</span>&lt;/connectionMode&gt;
+	&lt;MSM&gt;
+		&lt;security&gt;
+			&lt;authEncryption&gt;
+				&lt;authentication&gt;<span id="outputSecurityType">open</span>&lt;/authentication&gt;
+				&lt;encryption&gt;<span id="outputEncryption">none</span>&lt;/encryption&gt;
+				&lt;useOneX&gt;false&lt;/useOneX&gt;
+			&lt;/authEncryption&gt;
+			&lt;sharedKey&gt;
+				&lt;keyType&gt;passPhrase&lt;/keyType&gt;
+				&lt;protected&gt;false&lt;/protected&gt;
+				&lt;keyMaterial&gt;<span id="outputPassphrase"></span>&lt;/keyMaterial&gt;
+			&lt;/sharedKey&gt;
+		&lt;/security&gt;
+	&lt;/MSM&gt;
+&lt;/WLANProfile&gt;
+</code></pre>
+                </div>
+            </div>
+        </main>
+    </div>
+  </body>
+</html>
