@@ -41,7 +41,7 @@ Bootstrap and jQuery are loaded from their CDN - the Clipboard.js framework is l
 [Back to top](#table-of-contents)
 
 - You can simply use the GitHub pages link I have hosted! https://daduckmsft.github.io/WiFiProfileGenerator/
-- Alternatively, you can download everything from here (I don't have a release -yet-) - but you simply need... *index.html* and *android.html* and the *js* folder - all in the same path. It'll just work! 
+- Alternatively, you can download everything from [here](https://github.com/daduckMSFT/WiFiProfileGenerator/releases/latest), unzip, and enjoy! Nothing else needed - it should just work. 
 - If you want to host the dependencies yourself, you can compile & utilize bootstrap & jQuery and package it in - but you'll need to reference it. They have steps on their site to do this.
 - If you simply want a page, without even the clipboard.js local dependency - you can edit the page to load it from the CDN. 
 
