@@ -42,7 +42,10 @@ Bootstrap and jQuery are loaded from their CDN - the Clipboard.js framework is l
 
 - You can simply use the GitHub pages link I have hosted! https://daduckmsft.github.io/WiFiProfileGenerator/
 - Alternatively, you can download everything from here (I don't have a release -yet-) - but you simply need... *index.html* and *android.html* and the *js* folder - all in the same path. It'll just work! 
-- If you want to use it yourself, without worrying about anything else, you can simply download the file, edit the lines at the start of the <body> that look like this: 
+- If you want to host the dependencies yourself, you can compile & utilize bootstrap & jQuery and package it in - but you'll need to reference it. They have steps on their site to do this.
+- If you simply want a page, without even the clipboard.js local dependency - you can edit the page to load it from the CDN. 
+
+Edit the html files for both, and you'll see some lines in the ```html<body>``` that look like this: 
 ```html
     <!-- Load clipboard.js from local repo -->
     <script src="./js/clipboard.min.js"></script>
@@ -63,8 +66,9 @@ You can comment those out, and make it look like the following to use the Clipbo
 [Back to top](#table-of-contents)
 
 I tried to document the functions in a manner that's fairly straightforward - you can see more info on them here: 
-[iOS](https://github.com/daduckMSFT/WiFiProfileGenerator/functions-info/FUNCTIONS.md)
-[Android/Windows](https://github.com/daduckMSFT/WiFiProfileGenerator/functions-info/android-FUNCTIONS.md)
+
+- [iOS](https://github.com/daduckMSFT/WiFiProfileGenerator/wiki/iOS-Functions)
+- [Android/Windows](https://github.com/daduckMSFT/WiFiProfileGenerator/wiki/Android-and-Windows-functions)
 
 ## Why?
 
