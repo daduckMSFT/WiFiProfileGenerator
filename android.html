@@ -64,35 +64,35 @@
           });
       }
 
-      var changeColor = function(desiredColor,dest) {
-          $( dest ).css('color', desiredColor);
+      var changeColor = function(desiredColor,targetElementId) {
+          $( targetElementId ).css('color', desiredColor);
       };
 
-      var changeText = function (desiredValue,dest) {
-          $( dest ).text( desiredValue );
+      var changeText = function (desiredValue,targetElementId) {
+          $( targetElementId ).text( desiredValue );
       };
 
-      function inputText(input,dest,dest2=0) {
+      function inputText(input,targetElementId,optElementId=0) {
           $( input )
           .keyup(function(){
               var value = $( input ).val();
-              changeText(value, dest);
-              changeColor('aqua',dest);
-              if (dest2 != 0) {
-              changeText(value, dest2);
-              changeColor('aqua',dest2);
+              changeText(value, targetElementId);
+              changeColor('aqua',targetElementId);
+              if (optElementId != 0) {
+              changeText(value, optElementId);
+              changeColor('aqua',optElementId);
               };
           });
       };
 
-      function changeValue(destination,value,color,destination2=0,value2=0) {
-          var dest = document.getElementById(destination);
+      function changeValue(targetElementId,targetElementIdValue,color,optElementId=0,optElementIdValue=0) {
+          var dest = document.getElementById(targetElementId);
           changeColor(color,dest);
-          changeText(value,dest);
-          if (destination2 != 0) {
-            var dest2 = document.getElementById(destination2);
-            changeText(value2,dest2);
-            changeColor(color,dest2);};
+          changeText(targetElementIdValue,dest);
+          if (optElementIdValue != 0) {
+            var optionalTarget = document.getElementById(optElementId);
+            changeText(optElementIdValue,optionalTarget);
+            changeColor(color,optionalTarget);};
       };
 
       function passphraseEnableDisable(EnableDisable) {
@@ -101,14 +101,14 @@
           var disabledState = passphraseInput.is( ":disabled" );
 
           if (EnableDisable == 'disable') {
-            passphraseInput.prop( "value", "").prop("disabled", true);
-            passphraseOutput.prop ( "textContent", "");
-            };
+              passphraseInput.prop( "value", "").prop("disabled", true);
+              passphraseOutput.prop ( "textContent", "");
+              };
 
           if ((disabledState = true) & (EnableDisable == 'enable')) {
-            passphraseInput.prop( "disabled", false);
-            };
-      }
+              passphraseInput.prop( "disabled", false);
+              };
+      };
 
         function openSecurity() {
           if (pagePlatform == "iOS")
