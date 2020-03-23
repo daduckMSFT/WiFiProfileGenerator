@@ -39,6 +39,11 @@
     <!-- This is what converts the SSID to Hex in the resulting profile
     This function is called immediately on page load and constantly reads the values in the Wi-Fi SSID box and converts it to hex -->
     <script>
+      /* These are ALL of the functions needed for both iOS & Windows/Android. NOTE - There is a simple "PagePlatform" variable at the top here
+      This is used to dictate which fields are read / receive output (eg; for the passphrase, SSID, encryption type, etc. */
+      /* var pagePlatform = "iOS";  */
+      var pagePlatform = "AndroidWindows";
+
       function toHex(input) {
           var result = "";
               for (i=0; i<input.length; i++) {
@@ -47,87 +52,112 @@
               }
           return result
           };
-          function readHex() {
-              $( "#inputSSID" )
-              .keyup(function() {
-              var color = 'Aqua';
-              var value = $( this ).val();
-              outputvalue = toHex(value);
-              $( "#outputSSIDHex" ).text( outputvalue );
-              $( "#outputSSIDHex" ).css('color', color );
-              });
-          }
-    </script>
+      function readHex() {
+          $( "#inputSSID" )
+          .keyup(function() {
+          var color = 'Aqua';
+          var value = $( this ).val();
+          outputvalue = toHex(value);
+          $( "#outputSSIDHex" )
+              .text( outputvalue )
+              .css('color', color );
+          });
+      }
 
-    <!--Brief overview of what happens (very high level) - the input you enter into the fields (eg; SSID) or the buttons you tick, modify the default text in the "Generated Profile" at the bottom. 
-        The profile at the bottom is held in a set of two elements - <pre> and <code>. This keeps the formatting. 
-        The contents inside of it are a default one I exported from a Windows machine. I added some simple <span> elements to modify the text. 
-          There are spans (such as <span id="outputSSID">Sample SSID</span> that I identify with an ID - aka, outputSSID. 
-        These are changed in real-time with some javascript functions that run in the browser. See below for more... 
-        
-        For more information on these, visit my GitHub: https://github.com/daduckMSFT/WiFiProfileGenerator
-      -->
-    <script>
-        var colorAqua = 'Aqua';
-        var colorWhite = 'White';
+      var changeColor = function(desiredColor,dest) {
+          $( dest ).css('color', desiredColor);
+      };
 
-        function inputText(input,output,output2=0) {
+      var changeText = function (desiredValue,dest) {
+          $( dest ).text( desiredValue );
+      };
+
+      function inputText(input,dest,dest2=0) {
           $( input )
           .keyup(function(){
-            var value = $( input ).val();
-            $( output ).text( value );
-            $( output ).css('color', colorAqua );
-            if (output2 != 0) {
-              $( output2 ).text( value );
-              $( output2 ).css('color', colorAqua );};
+              var value = $( input ).val();
+              changeText(value, dest);
+              changeColor('aqua',dest);
+              if (dest2 != 0) {
+              changeText(value, dest2);
+              changeColor('aqua',dest2);
+              };
           });
-        };
-        
-        function changeValue(destination,value,color,destination2=0,value2=0) {
-          var dest = document.getElementById(destination);
-          if (color == 'aqua') {
-            var color = colorAqua;};
-          if (color == 'white') {
-            var color = colorWhite;};
-          if (destination2 != 0) {
-            var dest2 = document.getElementById(destination2);};
-          $( dest ).text( value );
-          $( dest ).css('color', color);
-          if (dest2 != null) {
-            $( dest2 ).text( value2 );
-            $( dest2 ).css('color', color);};
-        };
-        
-        function passphraseEnableDisable(input) {
-          var disabledState = $( '#inputPassphrase' ).is( ":disabled" );
-          var passphraseInput = $( '#inputPassphrase' );
-          var passphraseOutput = $( '#outputPassphrase' );
+      };
 
-          if (input == 'disable') {
-            passphraseInput.prop( "value", "");
+      function changeValue(destination,value,color,destination2=0,value2=0) {
+          var dest = document.getElementById(destination);
+          changeColor(color,dest);
+          changeText(value,dest);
+          if (destination2 != 0) {
+            var dest2 = document.getElementById(destination2);
+            changeText(value2,dest2);
+            changeColor(color,dest2);};
+      };
+
+      function passphraseEnableDisable(EnableDisable) {
+          var passphraseOutput = $( '#outputPassphrase' );
+          var passphraseInput = $( '#inputPassphrase' );
+          var disabledState = passphraseInput.is( ":disabled" );
+
+          if (EnableDisable == 'disable') {
+              passphraseInput.prop( "value", "").prop("disabled", true);
+              passphraseOutput.prop ( "textContent", "");
+              };
+
+          if ((disabledState = true) & (EnableDisable == 'enable')) {
+              passphraseInput.prop( "disabled", false);
+              };
+      };
+
+      function passphraseEnableDisable(EnableDisable) {
+          var passphraseOutput = $( '#outputPassphrase' );
+          var passphraseInput = $( '#inputPassphrase' );
+          var disabledState = passphraseInput.is( ":disabled" );
+
+          if (EnableDisable == 'disable') {
+            passphraseInput.prop( "value", "").prop("disabled", true);
             passphraseOutput.prop ( "textContent", "");
-            passphraseInput.prop( "disabled", true);
             };
 
-          if ((disabledState = true) & (input == 'enable')) {
+          if ((disabledState = true) & (EnableDisable == 'enable')) {
             passphraseInput.prop( "disabled", false);
             };
-        };
+      }
 
         function openSecurity() {
-          changeValue('outputSecurityType','open','white','outputEncryption','none');
-          passphraseEnableDisable('disable');}; 
+          if (pagePlatform == "iOS")
+          { 
+            changeValue('outputSecurityType','None','white');
+          }
+          else if (pagePlatform == "AndroidWindows") {
+            changeValue('outputSecurityType','open','white','outputEncryption','none');
+          }
+          passphraseEnableDisable('disable');
+      }
 
+      function pageLoad(platform) {
+          if (platform == "iOS") {
+              $(document).ready(function(){
+                  inputText("#inputSSID","#outputSSID");
+                  inputText("#inputPassphrase","#outputPassphrase");
+                  inputText("#inputDisplayName","#outputDisplayName","#outputBottomDisplayName");
+                });
+              }
+          else if (platform == "AndroidWindows") {
+              $(document).ready(function(){
+                  readHex();
+                  inputText("#inputSSID","#outputSSID","#outputNetworkName");
+                  inputText("#inputPassphrase","#outputPassphrase");
+                });
+          }
+}
     </script>
-
-    <!-- We take two of the above created functions, and when the page finishes loading, it calls them -->
     <script>
-      $(document).ready(function(){
-        readHex();
-        inputText("#inputSSID","#outputSSID","#outputNetworkName");
-        inputText("#inputPassphrase","#outputPassphrase");
-      });
-    </script>
+      /* Used to pass the platform (Android/Windows or iOS) to the "pageLoad" function. 
+      This is by the "readHex" and "inputText" functions (Only Android/Windows use the "readHex" function). */
+      pageLoad(pagePlatform);
+    </script> 
 
     <!-- This is the parent container, that keeps everything lined up in the middle -->
     <div class="container">
