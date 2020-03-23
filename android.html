@@ -101,21 +101,6 @@
           var disabledState = passphraseInput.is( ":disabled" );
 
           if (EnableDisable == 'disable') {
-              passphraseInput.prop( "value", "").prop("disabled", true);
-              passphraseOutput.prop ( "textContent", "");
-              };
-
-          if ((disabledState = true) & (EnableDisable == 'enable')) {
-              passphraseInput.prop( "disabled", false);
-              };
-      };
-
-      function passphraseEnableDisable(EnableDisable) {
-          var passphraseOutput = $( '#outputPassphrase' );
-          var passphraseInput = $( '#inputPassphrase' );
-          var disabledState = passphraseInput.is( ":disabled" );
-
-          if (EnableDisable == 'disable') {
             passphraseInput.prop( "value", "").prop("disabled", true);
             passphraseOutput.prop ( "textContent", "");
             };
